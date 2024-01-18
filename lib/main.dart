@@ -1,12 +1,30 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_logs/flutter_logs.dart';
+import 'package:logger/logger.dart';
+
+import 'log/log_viewer.dart';
+
+
 
 void main() {
-  runApp(const MyApp());
+  runApp( MyApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class MyApp extends StatefulWidget {
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+
+}
+
+class _MyAppState extends State<MyApp> {
+
+  // Create a list to store logs
+  static List<String> logs = [];
+  // Variable to store the last ID
+  String? lastId;
+  //const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -140,6 +158,16 @@ class MyApp extends StatelessWidget {
                   size: 40,),
               ),
               const SizedBox(height: 10,),
+          // Log section
+              Expanded(
+                child: Container(
+                  color: Colors.black, // Adjust color as needed
+                  child: Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: LogViewer(logs: logs),
+                  ),
+                ),
+              ),
             ],
           ),
         ),
@@ -148,7 +176,7 @@ class MyApp extends StatelessWidget {
   }
 
   //Create Method for api get
-  void fetchData() async{
+  void fetchData0() async{
     var dio = Dio();
     //Response response = await dio.get('https://jsonplaceholder.typicode.com/todos/1');
     Response response = await dio.get('https://653e4d91f52310ee6a9ace3c.mockapi.io/user');
@@ -157,6 +185,31 @@ class MyApp extends StatelessWidget {
     print(response.statusCode);
     print(response.data);
 
+    // Adding log
+    addLog('GET Request - Status Code: ${response.statusCode}');
+
+  }
+
+  //Create Method for api get
+  void fetchData() async {
+    var dio = Dio();
+    Response response;
+
+    try {
+      response = await dio.get('https://653e4d91f52310ee6a9ace3c.mockapi.io/user');
+      // print('This is from GET - ');
+      // print(response.statusCode);
+      // print(response.data);
+
+
+      // Adding log
+      addLog('GET Request - Status Code: ${response.statusCode}');
+      addLog('Response Data: ${response.data}');
+    } catch (error) {
+      print('Error fetching data: $error');
+      // Adding error log
+      addLog('Error fetching data: $error');
+    }
   }
 
   //Create Method for api post
@@ -171,6 +224,11 @@ class MyApp extends StatelessWidget {
     //print('$postResponse');
     print(postResponse.statusCode);
     print(postResponse.data);
+
+    addLog('This is from POST -');
+    //addLog(log)('$postResponse');
+    addLog(postResponse.statusCode.toString());
+    addLog(postResponse.data);
 
   }
 
@@ -189,6 +247,13 @@ class MyApp extends StatelessWidget {
     print(getPostResponse[1].statusCode);
     print(getPostResponse[1].data);
 
+    addLog('This is from get-post concurrently - ');
+    //addLog(log)('This is from POST - $getPostResponse');
+    addLog(getPostResponse[0].statusCode.toString());
+    addLog(getPostResponse[0].data);
+    addLog(getPostResponse[1].statusCode.toString());
+    addLog(getPostResponse[1].data);
+
   }
 
   //Create Method for api put - update entire row/record
@@ -204,7 +269,13 @@ class MyApp extends StatelessWidget {
     print(postResponse.statusCode);
     print(postResponse.data);
 
+    addLog('This is from Put - ');
+    //addLog(log)('This is from PUT - $postResponse');
+    addLog(postResponse.statusCode.toString());
+    addLog(postResponse.data);
+
   }
+
   //Create Method for api patch - update specific field only
   void patchData() async{
     var dio = Dio();
@@ -218,7 +289,13 @@ class MyApp extends StatelessWidget {
     print(patchResponse.statusCode);
     print(patchResponse.data);
 
+    addLog('This is from Patch - ');
+    //addLog(log)('This is from PUT - $patchResponse');
+    addLog(patchResponse.statusCode.toString());
+    addLog(patchResponse.data);
+
   }
+
   //Create Method for api Delete
   void deleteData() async{
     var dio = Dio();
@@ -231,6 +308,17 @@ class MyApp extends StatelessWidget {
     print(patchResponse.statusCode);
     print(patchResponse.data);
 
+    addLog('This is from Delete - ');
+    //addLog(log)('This is from PUT - $patchResponse');
+    addLog(patchResponse.statusCode.toString());
+    addLog(patchResponse.data);
+
+  }
+  // Method to add logs
+  void addLog(String log) {
+    setState(() {
+      logs.add(log);
+    });
   }
 
 }
